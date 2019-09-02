@@ -71,7 +71,7 @@
 	##### 读写文件
 	open('文件名称'，'打开形式')；
 	1. 在还未有此文件时，会自动生成该命名文件；
-	2. 打开形式：r-read; w-write; a-append; r+(open for reading and writing); a+ (open forreading and appending, writing at the end of the file)
+	2. 打开形式：r-read; w-write; a-append; r+(open for reading and writing); a+ (open forreading and appending, writing at the end of the file); +b (binary二进制)
 	```python
 	.write()写入
 	.read()读取内容
@@ -318,7 +318,182 @@
 	id(a[3]) == id(d[3])
 		False
 	```
+	<br>
+18. ##### Pickle模块
+	pickle可用来保存/提取python运算完的结果, 字典，变量，列表等
+	```python
+	import pickle
+
+	d ={'a':111, 2:[33,4,5],'67':{99:10,'s'='sad'}}
+
+	file = open('pickleexample.pickle','wb')
+	pickle.dump(d,file) # 将d的结果取出，倒进file
+
+	file.close() # 保存并关闭文件
+
+	想要读取时， 存为字典d2
+	with open('pickleexample.pickle','rb') as file：
+		d2 = pickle.load(file)
+	```
+	<br>
+19. ##### Set
+	在列表中找不同，去重
+	```python
+	char_list = ['a','b','b','c','c','d']
+	unique_char = set(char_list())
+	print(unique_char)
+		{'a','b','c','d'} # 返回一个class为 set 的结果
+	
+	unique_char.add('x') # 只能加 一个值，不可以加 list
+	print(unique_char)
+		{'a','b','c','d','x'} 
+	
+	unique_char.clear('a') 
+	print(unique_char)
+		set() # 返回一个空 set()
+
+	unique_char.discard('a') 
+	print(unique_char)
+		{'b','c','d','x'} 	
+
+	unique_char.remove('y') 
+	print(unique_char)
+		会因'y'不存在而报错， .discard不会
+	```
+	对两个set进行比对，
+	```python
+	setA = set(char_list())
+	setB = {'a','e','i'}
+	```
+	找出不同：A 有 B 没有的唯一值
+	```python
+	print(setA.difference(setB))
+		{'b','c','d'} 
+	```
+	找出相同：A 有 B 也有的唯一值
+	```python
+	print(setA.intersection(setB))
+		{'a'} 
+	```
+	<br>
+20. #### 正则表达式 regular expression (RegEx)
+	对文本处理的强大武器,是用来匹配字符的一种工具，在一大串字符中找到所需内容。在python中通过导入 re 的模块引用正则表达式的功
+	```python
+
+	pattern1 = 'cat'
+	pattern2 = 'bird'
+	string = 'dog runs to cat'
+
+	判断pattern是否在string中
+	```
+	<u>简单python匹配</u>
+	```python
+	# matching string
+	print(pattern1 in string)
+		True
+	print(pattern2 in string)
+		False
+	```
+	<u>用正则表达式寻找配对</u>
+	```python
+	# regular expression
+	import re
+	print(re.search(pattern1, string))
+		<object>
+	print(re.search(pattern2, string))
+		None
+	```
+	<u>匹配多种可能 [ ] </u>
+	```python
+	# multiple ('ran' or 'run')
+	import re
+	pattern = r"r[au]n" # r 代表“”中是表达式而不是单纯的值，使用 [] 包含多种可能
+	print(re.search(pattern, string))
+		<object>
+	```
+	可以将 [ ] 中的内容设置为更多种
+	```python
+	一般字符/数字：
+	[A-Z] | [a-z] | [0-9] | [0-9a-z]
+	
+	特殊种类：
+	\d = 所有数字，包含小数点				
+	\D = 所有非数字和小数点的值
+	\s = 所有空白字符 [\t\n\r\f\v] ; \t (Tab 制表符) 、 \r (回车符)、\n (换行符) 和 \f (换页符) 
+	\b = 相当于设定字符的前后都需要有 单个的 空格，如 r"\brun\b"
+	\B = 相当于设定字符的前后都需要有空格
+	()? = 可能存在也可能不存在的值放在括号里，如 r"Mon(day)?"
+	^ = 判断是否在句首 r"^ dog"
+	$ = 判断是否在句尾 r"cat$"
+	. = 所有
+	```
+	如果是多个句子需要做匹配的判断，如需要判断每个句子的句尾/句首，则可以用 flags=re.M, M 表示multiple lines多行
+	```python 
+	string = """ dog runs to cat.
+	cat runs to mouse.
+	"""
+	print (re.search(r"^cat", string)
+		None
+	print (re.search(r"^cat", string, flags=re.M))
+		<object>
+	```
+	字符出现的次数：0次或者多次；1次或者多次; 或自定义次数
+	```python 
+	occur 0 or more times  *
+	print(re.reserch(r"ab*","a"))
+		<object>
+	print(re.reserch(r"ab*","abbbbb"))
+		<object>
+	```
+
+	```python 
+	occur 1 or more times  +
+	print(re.reserch(r"ab+","a"))
+		None
+	print(re.reserch(r"ab+","abbbbb"))
+		<object>
+	```
+	```python 
+	occur n to m times  {}
+	print(re.reserch(r"ab{2,10}","a"))
+		None
+	print(re.reserch(r"ab{2,10}","abbbbb"))
+		<object>
+	```
+	<u>寻找出所有匹配的值/字符串</u> re.findall()
+	```python 
+	# findall
+	print(re.findall(r"r[au]n","run ran ren"))
+		['ran','run']
+	# or
+	print(re.findall(r"ran|run","run ran ren"))
+		['ran','run']
+	```
+	<u>替换匹配到的值/字符串</u> re.sub()
+	```python 
+	# replace value/string(char)
+	print(re.sub(r"r[au]n",'jumps',"dog runs to cat"))
+		'dog jumps to cat'
+
+	```	
+	<u>分裂</u> re.split()
+	```python 
+	# seperate
+	print(re.split(r"r[,\.;]","a,b.c;d/e")) 因为'.'代表了任何东西， 所以要反斜杠'\' 去除该功能
+		['a','b','c','d','e']
+	```
+
+	<br>
+
+	
 
 
 
-	切断
+
+
+
+
+
+
+
+
